@@ -103,18 +103,29 @@
         });
     });
 
+    // --- Mémo du prénom sélectionné actuellement ---
+    let prenomActuel = "";
+
     // --- Mettre à jour l'état du joueur quand il choisit un prénom ---
     prenomSelect.addEventListener('change', () => {
         const prenom = prenomSelect.value;
-        if (!prenom) return;
 
-        const userRef = db.ref('participants/' + prenom);
+        // Libérer l'ancien prénom si existant
+        if (prenomActuel) {
+            db.ref('participants/' + prenomActuel).set({ choisi: false });
+        }
 
-        // Marquer le prénom choisi
-        userRef.set({ choisi: true });
-    
-        // onDisconnect() → remet à false si le joueur quitte
-        userRef.onDisconnect().set({ choisi: false });
+        if (prenom) {
+            const userRef = db.ref('participants/' + prenom);
+            userRef.set({ choisi: true });
+
+            // onDisconnect() → remet à false si le joueur quitte
+            userRef.onDisconnect().set({ choisi: false });
+
+            prenomActuel = prenom; // mémoriser le prénom actuel
+        } else {
+            prenomActuel = "";
+        }
     });
 
     // --- Écoute en temps réel pour activer bouton et désactiver options ---
