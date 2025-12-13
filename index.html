@@ -57,10 +57,16 @@
             background: #007bff;
             color: white;
             cursor: pointer;
+            transition: 0.2s;
         }
 
         button:active {
             transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
         }
 
         /* Overlay plein écran */
@@ -75,7 +81,6 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            display: flex;
         }
 
         #overlay img {
@@ -100,10 +105,11 @@
     <br><br>
     <button id="btn" disabled>Lancer le jeu</button>
 </div>
+
 <div id="overlay" onclick="fermerImage()">
     <img src="image.jpg" alt="Image plein écran">
 </div>
-    
+
 <script>
 const btn = document.getElementById("btn");
 const prenomSelect = document.getElementById("prenom");
@@ -112,7 +118,14 @@ const prenomSelect = document.getElementById("prenom");
 const userId = 'user-' + Math.random().toString(36).substr(2, 9);
 const userRef = db.collection('participants').doc(userId);
 
-// Mettre à jour le prénom et prêt quand on choisit
+// --- Nettoyer les anciens visiteurs au chargement ---
+db.collection('participants').get().then(snapshot => {
+    snapshot.forEach(doc => {
+        doc.ref.delete();
+    });
+});
+
+// --- Mettre à jour le prénom et prêt quand on choisit ---
 prenomSelect.addEventListener('change', () => {
     const prenom = prenomSelect.value;
     if (prenom) {
@@ -128,21 +141,35 @@ prenomSelect.addEventListener('change', () => {
     }
 });
 
-// Écoute en temps réel
+// --- Écoute en temps réel ---
 db.collection('participants').onSnapshot(snapshot => {
     let count = 0;
+    const pris = [];
+
     snapshot.forEach(doc => {
-        if (doc.data().pret) count++;
+        const data = doc.data();
+        if (data.pret) count++;
+        // Collecte des prénoms déjà pris (sauf le sien)
+        if (data.pret && doc.id !== userId) {
+            pris.push(data.prenom);
+        }
     });
 
-    if (count >= 2) {
-        btn.disabled = false;
-    } else {
-        btn.disabled = true;
-    }
+    // Activer le bouton seulement quand 3 participants prêts
+    btn.disabled = count < 2;
+
+    // Désactiver les options déjà prises
+    const options = prenomSelect.querySelectorAll('option');
+    options.forEach(opt => {
+        if (pris.includes(opt.value)) {
+            opt.disabled = true;
+        } else {
+            opt.disabled = false;
+        }
+    });
 });
 
-// Bouton pour afficher l'image en plein écran
+// --- Bouton pour afficher l'image en plein écran ---
 function ouvrirImage() {
     document.getElementById("overlay").style.display = "flex";
 }
@@ -151,7 +178,6 @@ function fermerImage() {
     document.getElementById("overlay").style.display = "none";
 }
 </script>
-
 
 </body>
 </html>
