@@ -92,9 +92,7 @@
     const btn = document.getElementById("btn");
     const prenomSelect = document.getElementById("prenom");
 
-    // Générer un ID aléatoire pour chaque joueur
-    const userId = 'user-' + Math.random().toString(36).substr(2, 9);
-    const userRef = db.ref('participants/' + userId);
+    const userRef = db.ref('participants/' + prenom);
 
     // Liste fixe des joueurs connus
     const joueursFixes = ["Angelo", "Vinciane", "Coraline", "Jason", "Kelly", "Nathan"];
@@ -113,14 +111,13 @@
         const prenom = prenomSelect.value;
         if (!prenom) return;
 
-        // Marquer le prénom choisi à true
-        db.ref('participants/' + prenom).set({ choisi: true });
+        const userRef = db.ref('participants/' + prenom);
 
+        // Marquer le prénom choisi
+        userRef.set({ choisi: true });
+    
         // onDisconnect() → remet à false si le joueur quitte
-        db.ref('participants/' + prenom).onDisconnect().set({ choisi: false });
-
-        // Associer cet ID utilisateur à ce prénom pour son overlay
-        userRef.set({ prenom: prenom });
+        userRef.onDisconnect().set({ choisi: false });
     });
 
     // --- Écoute en temps réel pour activer bouton et désactiver options ---
