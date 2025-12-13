@@ -4,12 +4,44 @@
     <meta charset="UTF-8">
     <title>Killer Party</title>
 
+    <!-- Important pour le mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f5f5f5;
             font-family: Arial, sans-serif;
         }
 
-        /* Fond plein écran */
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Overlay plein écran */
         #overlay {
             display: none;
             position: fixed;
@@ -23,7 +55,6 @@
             z-index: 9999;
         }
 
-        /* Image centrée */
         #overlay img {
             max-width: 100%;
             max-height: 100%;
@@ -32,9 +63,10 @@
 </head>
 <body>
 
-<h1>Killer Party</h1>
-
-<button onclick="ouvrirImage()">Lancer le jeu</button>
+<div class="container">
+    <h1>Killer Party</h1>
+    <button onclick="ouvrirImage()">Lancer le jeu</button>
+</div>
 
 <div id="overlay" onclick="fermerImage()">
     <img src="image.jpg" alt="Image plein écran">
