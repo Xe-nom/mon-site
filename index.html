@@ -86,13 +86,10 @@
         appId: "1:227545744120:web:c313a7c4a5c6c541d8f10d"
     };
     firebase.initializeApp(firebaseConfig);
-
     const db = firebase.database();
 
     const btn = document.getElementById("btn");
     const prenomSelect = document.getElementById("prenom");
-
-    const userRef = db.ref('participants/' + prenom);
 
     // Liste fixe des joueurs connus
     const joueursFixes = ["Angelo", "Vinciane", "Coraline", "Jason", "Kelly", "Nathan"];
