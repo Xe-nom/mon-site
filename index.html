@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon site</title>
+</head>
+<body>
+
+<h1>Bienvenue</h1>
+
+<button onclick="afficherImage()">Voir l'image</button>
+
+<img id="img" src="image.jpg" style="display:none; width:300px;">
+
+<script>
+function afficherImage() {
+    document.getElementById("img").style.display = "block";
+}
+</script>
+
+</body>
+</html>
