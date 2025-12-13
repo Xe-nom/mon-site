@@ -6,22 +6,6 @@
     
     <!-- Firestore -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyDN8pOUrRGbpatuYRwLQqFPeRzWNJphgaw",
-        authDomain: "page-synchrone.firebaseapp.com",
-        projectId: "page-synchrone",
-        storageBucket: "page-synchrone.firebasestorage.app",
-        messagingSenderId: "227545744120",
-        appId: "1:227545744120:web:c313a7c4a5c6c541d8f10d"
-      };
-    
-      // Initialiser Firebase
-      firebase.initializeApp(firebaseConfig);
-    
-      // Accès à la base Firestore
-      const db = firebase.firestore();
-    </script>
 
     <meta charset="UTF-8">
     <title>Killer Party</title>
@@ -111,73 +95,84 @@
 </div>
 
 <script>
-const btn = document.getElementById("btn");
-const prenomSelect = document.getElementById("prenom");
+    // --- Configuration Firebase ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDN8pOUrRGbpatuYRwLQqFPeRzWNJphgaw",
+        authDomain: "page-synchrone.firebaseapp.com",
+        projectId: "page-synchrone",
+        storageBucket: "page-synchrone.firebasestorage.app",
+        messagingSenderId: "227545744120",
+        appId: "1:227545744120:web:c313a7c4a5c6c541d8f10d"
+    };
 
-// Générer un ID aléatoire pour chaque visiteur
-const userId = 'user-' + Math.random().toString(36).substr(2, 9);
-const userRef = db.collection('participants').doc(userId);
-
-// --- Nettoyer les anciens visiteurs au chargement ---
-db.collection('participants').get().then(snapshot => {
-    snapshot.forEach(doc => {
-        doc.ref.delete();
-    });
-});
-
-// --- Mettre à jour le prénom et prêt quand on choisit ---
-prenomSelect.addEventListener('change', () => {
-    const prenom = prenomSelect.value;
-    if (prenom) {
-        userRef.set({
-            prenom: prenom,
-            pret: true
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const btn = document.getElementById("btn");
+    const prenomSelect = document.getElementById("prenom");
+    
+    // Générer un ID aléatoire pour chaque visiteur
+    const userId = 'user-' + Math.random().toString(36).substr(2, 9);
+    const userRef = db.collection('participants').doc(userId);
+    
+    // --- Nettoyer les anciens visiteurs au chargement ---
+    db.collection('participants').get().then(snapshot => {
+        snapshot.forEach(doc => {
+            doc.ref.delete();
         });
-    } else {
-        userRef.set({
-            prenom: "",
-            pret: false
-        });
-    }
-});
-
-// --- Écoute en temps réel ---
-db.collection('participants').onSnapshot(snapshot => {
-    let count = 0;
-    const pris = [];
-
-    snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.pret) count++;
-        // Collecte des prénoms déjà pris (sauf le sien)
-        if (data.pret && doc.id !== userId) {
-            pris.push(data.prenom);
-        }
     });
 
-    // Activer le bouton seulement quand 3 participants prêts
-    btn.disabled = count < 2;
-
-    // Désactiver les options déjà prises
-    const options = prenomSelect.querySelectorAll('option');
-    options.forEach(opt => {
-        if (pris.includes(opt.value)) {
-            opt.disabled = true;
+    // --- Mettre à jour le prénom et prêt quand on choisit ---
+    prenomSelect.addEventListener('change', () => {
+        const prenom = prenomSelect.value;
+        if (prenom) {
+            userRef.set({
+                prenom: prenom,
+                pret: true
+            });
         } else {
-            opt.disabled = false;
+            userRef.set({
+                prenom: "",
+                pret: false
+            });
         }
     });
-});
+    
+    // --- Écoute en temps réel ---
+    db.collection('participants').onSnapshot(snapshot => {
+        let count = 0;
+        const pris = [];
+    
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.pret) count++;
+            // Collecte des prénoms déjà pris (sauf le sien)
+            if (data.pret && doc.id !== userId) {
+                pris.push(data.prenom);
+            }
+        });
+    
+        // Activer le bouton seulement quand 3 participants prêts
+        btn.disabled = count < 2;
+    
+        // Désactiver les options déjà prises
+        const options = prenomSelect.querySelectorAll('option');
+        options.forEach(opt => {
+            if (pris.includes(opt.value)) {
+                opt.disabled = true;
+            } else {
+                opt.disabled = false;
+            }
+        });
+    });
+    
+     // --- Bouton pour afficher l'image ---
+    btn.addEventListener('click', () => {
+        document.getElementById("overlay").style.display = "flex";
+    });
 
-// --- Bouton pour afficher l'image en plein écran ---
-function ouvrirImage() {
-    document.getElementById("overlay").style.display = "flex";
-}
-
-function fermerImage() {
-    document.getElementById("overlay").style.display = "none";
-}
+    function fermerImage() {
+        document.getElementById("overlay").style.display = "none";
+    }
 </script>
-
 </body>
 </html>
