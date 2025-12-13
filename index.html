@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Firebase App (obligatoire) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    
+    <!-- Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDN8pOUrRGbpatuYRwLQqFPeRzWNJphgaw",
+        authDomain: "page-synchrone.firebaseapp.com",
+        projectId: "page-synchrone",
+        storageBucket: "page-synchrone.firebasestorage.app",
+        messagingSenderId: "227545744120",
+        appId: "1:227545744120:web:c313a7c4a5c6c541d8f10d"
+      };
+    
+      // Initialiser Firebase
+      firebase.initializeApp(firebaseConfig);
+    
+      // Accès à la base Firestore
+      const db = firebase.firestore();
+    </script>
+
     <meta charset="UTF-8">
     <title>Killer Party</title>
 
@@ -62,17 +84,60 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h1>Killer Party</h1>
-    <button onclick="ouvrirImage()">Lancer le jeu</button>
+    <h1>Mon Grand Titre</h1>
+    <select id="prenom">
+        <option value="">Choisir votre prénom</option>
+        <option value="Angelo">Angelo</option>
+        <option value="Vinciane">Vinciane</option>
+        <option value="Coraline">Coraline</option>
+        <option value="Jason">Jason</option>
+        <option value="Kelly">Kelly</option>
+        <option value="Nathan">Nathan</option>
+    </select>
+    <br><br>
+    <button id="btn" disabled>Lancer le jeu</button>
 </div>
-
-<div id="overlay" onclick="fermerImage()">
-    <img src="image.jpg" alt="Image plein écran">
-</div>
-
+    
 <script>
+const btn = document.getElementById("btn");
+const prenomSelect = document.getElementById("prenom");
+
+// Générer un ID aléatoire pour chaque visiteur
+const userId = 'user-' + Math.random().toString(36).substr(2, 9);
+const userRef = db.collection('participants').doc(userId);
+
+// Mettre à jour le prénom et prêt quand on choisit
+prenomSelect.addEventListener('change', () => {
+    const prenom = prenomSelect.value;
+    if (prenom) {
+        userRef.set({
+            prenom: prenom,
+            pret: true
+        });
+    } else {
+        userRef.set({
+            prenom: "",
+            pret: false
+        });
+    }
+});
+
+// Écoute en temps réel
+db.collection('participants').onSnapshot(snapshot => {
+    let count = 0;
+    snapshot.forEach(doc => {
+        if (doc.data().pret) count++;
+    });
+
+    if (count >= 2) {
+        btn.disabled = false;
+    } else {
+        btn.disabled = true;
+    }
+});
+
+// Bouton pour afficher l'image en plein écran
 function ouvrirImage() {
     document.getElementById("overlay").style.display = "flex";
 }
@@ -81,6 +146,7 @@ function fermerImage() {
     document.getElementById("overlay").style.display = "none";
 }
 </script>
+
 
 </body>
 </html>
