@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- Firebase App (obligatoire) -->
+    <!-- Firebase App -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    
-    <!-- Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <meta charset="UTF-8">
     <title>Killer Party</title>
-
-    <!-- Important pour le mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -23,16 +20,8 @@
             background: #f5f5f5;
             font-family: Arial, sans-serif;
         }
-
-        .container {
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
+        .container { text-align: center; }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
         button {
             font-size: 1.2rem;
             padding: 15px 30px;
@@ -43,30 +32,20 @@
             cursor: pointer;
             transition: 0.2s;
         }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        button:disabled {
-            background: #999;
-            cursor: not-allowed;
-        }
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #999; cursor: not-allowed; }
 
         /* Overlay plein écran */
         #overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top:0; left:0;
+            width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.9);
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
-
         #overlay img {
             max-width: 100%;
             max-height: 100%;
@@ -75,6 +54,7 @@
     </style>
 </head>
 <body>
+
 <div class="container">
     <h1>Killer Party</h1>
     <select id="prenom">
@@ -99,80 +79,29 @@
     const firebaseConfig = {
         apiKey: "AIzaSyDN8pOUrRGbpatuYRwLQqFPeRzWNJphgaw",
         authDomain: "page-synchrone.firebaseapp.com",
+        databaseURL: "https://page-synchrone-default-rtdb.europe-west1.firebasedatabase.app/",
         projectId: "page-synchrone",
         storageBucket: "page-synchrone.firebasestorage.app",
         messagingSenderId: "227545744120",
         appId: "1:227545744120:web:c313a7c4a5c6c541d8f10d"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+
+    const db = firebase.database();
+
     const btn = document.getElementById("btn");
     const prenomSelect = document.getElementById("prenom");
-    
-    // Générer un ID aléatoire pour chaque visiteur
+
+    // Générer un ID aléatoire pour chaque joueur
     const userId = 'user-' + Math.random().toString(36).substr(2, 9);
-    const userRef = db.collection('participants').doc(userId);
-    
-    // --- Nettoyer les anciens visiteurs au chargement ---
-    db.collection('participants').get().then(snapshot => {
-        snapshot.forEach(doc => {
-            doc.ref.delete();
-        });
-    });
+    const userRef = db.ref('participants/' + userId);
 
-    // --- Mettre à jour le prénom et prêt quand on choisit ---
-    prenomSelect.addEventListener('change', () => {
-        const prenom = prenomSelect.value;
-        if (prenom) {
-            userRef.set({
-                prenom: prenom,
-                pret: true
-            });
-        } else {
-            userRef.set({
-                prenom: "",
-                pret: false
-            });
-        }
-    });
-    
-    // --- Écoute en temps réel ---
-    db.collection('participants').onSnapshot(snapshot => {
-        let count = 0;
-        const pris = [];
-    
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.pret) count++;
-            // Collecte des prénoms déjà pris (sauf le sien)
-            if (data.pret && doc.id !== userId) {
-                pris.push(data.prenom);
-            }
-        });
-    
-        // Activer le bouton seulement quand 3 participants prêts
-        btn.disabled = count < 2;
-    
-        // Désactiver les options déjà prises
-        const options = prenomSelect.querySelectorAll('option');
-        options.forEach(opt => {
-            if (pris.includes(opt.value)) {
-                opt.disabled = true;
-            } else {
-                opt.disabled = false;
-            }
-        });
-    });
-    
-     // --- Bouton pour afficher l'image ---
-    btn.addEventListener('click', () => {
-        document.getElementById("overlay").style.display = "flex";
-    });
+    // Liste fixe des joueurs connus
+    const joueursFixes = ["Angelo", "Vinciane", "Coraline", "Jason", "Kelly", "Nathan"];
 
-    function fermerImage() {
-        document.getElementById("overlay").style.display = "none";
-    }
-</script>
-</body>
-</html>
+    // --- Initialiser les joueurs dans la DB si pas déjà présents ---
+    joueursFixes.forEach(prenom => {
+        db.ref('participants/' + prenom).once('value', snapshot => {
+            if (!snapshot.exists()) {
+                db.ref('participants/' + prenom).set({ choisi: false });
+            }
