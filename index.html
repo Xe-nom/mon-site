@@ -2,19 +2,51 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mon site</title>
+    <title>Killer Party</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Fond plein écran */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Image centrée */
+        #overlay img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Bienvenue</h1>
+<h1>Killer Party</h1>
 
-<button onclick="afficherImage()">Voir l'image</button>
+<button onclick="ouvrirImage()">Lancer le jeu</button>
 
-<img id="img" src="image.jpg" style="display:none; width:300px;">
+<div id="overlay" onclick="fermerImage()">
+    <img src="image.jpg" alt="Image plein écran">
+</div>
 
 <script>
-function afficherImage() {
-    document.getElementById("img").style.display = "block";
+function ouvrirImage() {
+    document.getElementById("overlay").style.display = "flex";
+}
+
+function fermerImage() {
+    document.getElementById("overlay").style.display = "none";
 }
 </script>
 
