@@ -35,15 +35,14 @@
             background-position: center;
             background-repeat: no-repeat;
             
-            color: white;
+            color: black;
             font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
             
             cursor: pointer;
             transition: 0.2s;
         }
         button:active { transform: scale(0.98); }
-        button:disabled { background: #999; cursor: not-allowed; }
+        button:disabled { cursor: not-allowed; }
 
         /* Overlay plein écran */
         #overlay {
@@ -73,6 +72,7 @@
 
 <div class="container">
     <img src="titre.jpg" alt="Killer Party" class="title-image">
+    <br>
     <select id="prenom">
         <option value="">Choisir votre prénom</option>
         <option value="Angelo">Angelo</option>
@@ -83,7 +83,7 @@
         <option value="Nathan">Nathan</option>
     </select>
     <br><br>
-    <button id="btn" disabled>Lancer le jeu"</button>
+    <button id="btn" disabled>Lancer le jeu</button>
 </div>
 
 <div id="overlay" onclick="fermerImage()">
