@@ -18,10 +18,7 @@
             justify-content: center;
             align-items: center;
             
-            background-image: url("background.jpg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background: #f5f5f5;
             
             font-family: Arial, sans-serif;
         }
@@ -32,8 +29,16 @@
             padding: 15px 30px;
             border: none;
             border-radius: 8px;
-            background: #007bff;
+            
+            background-image: url("blood.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
             color: white;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            
             cursor: pointer;
             transition: 0.2s;
         }
@@ -56,12 +61,18 @@
             max-height: 100%;
             object-fit: contain;
         }
+
+        .title-image {
+            width: 300px;        /* taille desktop */
+            max-width: 80vw;     /* responsive mobile */
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Killer Party</h1>
+    <img src="titre.jpg" alt="Killer Party" class="title-image">
     <select id="prenom">
         <option value="">Choisir votre prénom</option>
         <option value="Angelo">Angelo</option>
@@ -72,9 +83,7 @@
         <option value="Nathan">Nathan</option>
     </select>
     <br><br>
-    <button id="btn" disabled>
-        <img src="blood.png" alt="Lancer le jeu">
-    </button>
+    <button id="btn" disabled>Lancer le jeu"</button>
 </div>
 
 <div id="overlay" onclick="fermerImage()">
