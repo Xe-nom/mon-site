@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Firebase App -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <!-- Firebase Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <meta charset="UTF-8">
+    <title>Killer Party</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            background: #FFFFFF;
+            
+            font-family: Arial, sans-serif;
+        }
+        .container { text-align: center; }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        button {
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            
+            background-image: url("blood.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            color: black;
+            font-weight: bold;
+            
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Overlay plein écran */
+        #overlay {
+            display: none;
+            position: fixed;
+            top:0; left:0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #overlay img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .title-image {
+            width: 300px;        /* taille desktop */
+            max-width: 80vw;     /* responsive mobile */
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="titre.jpg" alt="Killer Party" class="title-image">
+    <br>
+    <select id="prenom">
+        <option value="">Choisir votre prénom</option>
+        <option value="Angelo">Angelo</option>
+        <option value="Vinciane">Vinciane</option>
+        <option value="Coraline">Coraline</option>
+        <option value="Jason">Jason</option>
+        <option value="Kelly">Kelly</option>
+        <option value="Nathan">Nathan</option>
+        <option value="GdPere">Grand père</option>
+        <option value="Mamy">Mamy</option>
+        <option value="Brigitte">Brigitte</option>
+        <option value="Aurelie">Aurélie</option>
+        <option value="Nadege">Nadège</option>
+        <option value="Robert">Robert</option>
+        <option value="Manon">Manon</option>
+        <option value="Florian">Florian</option>
+        <option value="Dominique">Dominique</option>
+        <option value="Tristan">Tristan</option>
+        <option value="Jean-Yves">Jean-Yves</option>
+        <option value="Fabienne">Fabienne</option>
+        <option value="Andrew">Andrew</option>
+        <option value="CharlineH">Charline H</option>
+        <option value="Margaux">Margaux</option>
+        <option value="Arnaud">Arnaud</option>
+        <option value="CharlineV">Charline V</option>
+        <option value="Xavier">Xavier</option>
+    </select>
+    <br><br>
+    <button id="btn" disabled>Lancer le jeu</button>
+</div>
+
+<div id="overlay" onclick="fermerImage()">
+    <img src="image.jpg" alt="Image plein écran">
+</div>
+
+<script>
+    // --- Configuration Firebase ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDN8pOUrRGbpatuYRwLQqFPeRzWNJphgaw",
+        authDomain: "page-synchrone.firebaseapp.com",
+        databaseURL: "https://page-synchrone-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "page-synchrone",
+        storageBucket: "page-synchrone.firebasestorage.app",
+        messagingSenderId: "227545744120",
+        appId: "1:227545744120:web:c313a7c4a5c6c541d8f10d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const btn = document.getElementById("btn");
+    const prenomSelect = document.getElementById("prenom");
+
+    // Liste fixe des joueurs connus
+    const joueursFixes = ["Angelo", "Vinciane", "Coraline", "Jason", "Kelly", "Nathan", "GdPere", "Mamy", "Brigitte", "Aurelie", "Nadege", "Dominique", "Robert", "Manon", "Florian", "Tristan", "Jean-Yves",
+                          "Fabienne", "Andrew", "CharlineH", "Margaux", "Arnaud", "Xavier", "CharlineV"];
+
+    // --- Initialiser les joueurs dans la DB si pas déjà présents ---
+    joueursFixes.forEach(prenom => {
+        db.ref('participants/' + prenom).once('value', snapshot => {
+            if (!snapshot.exists()) {
+                db.ref('participants/' + prenom).set({ choisi: false });
+            }
+        });
+    });
+
+    // --- Mémo du prénom sélectionné actuellement ---
+    let prenomActuel = "";
+
+    // --- Mettre à jour l'état du joueur quand il choisit un prénom ---
+    prenomSelect.addEventListener('change', () => {
+        const prenom = prenomSelect.value;
+
+        // Libérer l'ancien prénom si existant
+        if (prenomActuel) {
+            db.ref('participants/' + prenomActuel).set({ choisi: false });
+        }
+
+        if (prenom) {
+            const userRef = db.ref('participants/' + prenom);
+            userRef.set({ choisi: true });
+
+            // onDisconnect() → remet à false si le joueur quitte
+            userRef.onDisconnect().set({ choisi: false });
+
+            prenomActuel = prenom; // mémoriser le prénom actuel
+        } else {
+            prenomActuel = "";
+        }
+    });
+
+    // --- Écoute en temps réel pour activer bouton et désactiver options ---
+    db.ref('participants').on('value', snapshot => {
+        const data = snapshot.val();
+        let count = 0;
+
+        // Collecte des prénoms déjà pris
+        const pris = [];
+        for (let key in data) {
+            if (data[key].choisi) {
+                count++;
+                pris.push(key);
+            }
+        }
+
+        // Activer le bouton si tous les joueurs connus sont prêts
+        btn.disabled = count < joueursFixes.length;
+
+        // Désactiver les options déjà prises
+        const options = prenomSelect.querySelectorAll('option');
+        options.forEach(opt => {
+            if (pris.includes(opt.value)) {
+                opt.disabled = true;
+            } else {
+                opt.disabled = false;
+            }
+        });
+    });
+
+    // --- Bouton pour afficher l'image ---
+    btn.addEventListener('click', () => {
+        document.getElementById("overlay").style.display = "flex";
+    });
+
+    function fermerImage() {
+        document.getElementById("overlay").style.display = "none";
+    }
+
+</script>
+</body>
+</html>
