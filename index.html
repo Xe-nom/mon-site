@@ -81,6 +81,22 @@
         <option value="Jason">Jason</option>
         <option value="Kelly">Kelly</option>
         <option value="Nathan">Nathan</option>
+        <option value="GdPere">Grand père</option>
+        <option value="Mamy">Mamy</option>
+        <option value="Brigitte">Brigitte</option>
+        <option value="Aurelie">Aurélie</option>
+        <option value="Nadege">Nadège</option>
+        <option value="Robert">Robert</option>
+        <option value="Manon">Manon</option>
+        <option value="Florian">Florian</option>
+        <option value="Dominique">Dominique</option>
+        <option value="Tristan">Tristan</option>
+        <option value="Jean-Yves">Jean-Yves</option>
+        <option value="Fabienne">Fabienne</option>
+        <option value="Andrew">Andrew</option>
+        <option value="CharlineH">Charline H</option>
+        <option value="Margaux">Margaux</option>
+        <option value="Arnaud">Arnaud</option>
     </select>
     <br><br>
     <button id="btn" disabled>Lancer le jeu</button>
@@ -108,7 +124,8 @@
     const prenomSelect = document.getElementById("prenom");
 
     // Liste fixe des joueurs connus
-    const joueursFixes = ["Angelo", "Vinciane", "Coraline", "Jason", "Kelly", "Nathan"];
+    const joueursFixes = ["Angelo", "Vinciane", "Coraline", "Jason", "Kelly", "Nathan", "GdPere", "Mamy", "Brigitte", "Aurelie", "Nadege", "Dominique", "Robert", "Manon", "Florian", "Tristan", "Jean-Yves",
+                          "Fabienne", "Andrew", "CharlineH", "Margaux", "Arnaud"];
 
     // --- Initialiser les joueurs dans la DB si pas déjà présents ---
     joueursFixes.forEach(prenom => {
@@ -159,8 +176,7 @@
         }
 
         // Activer le bouton si tous les joueurs connus sont prêts
-        btn.disabled = count < 1
-            //joueursFixes.length;
+        btn.disabled = count < joueursFixes.length;
 
         // Désactiver les options déjà prises
         const options = prenomSelect.querySelectorAll('option');
