@@ -67,7 +67,9 @@
         <option value="Nathan">Nathan</option>
     </select>
     <br><br>
-    <button id="btn" disabled>Lancer le jeu</button>
+    <button id="btn" disabled>
+        <img src="blood.png" alt="Lancer le jeu">
+    </button>
 </div>
 
 <div id="overlay" onclick="fermerImage()">
@@ -143,7 +145,8 @@
         }
 
         // Activer le bouton si tous les joueurs connus sont prêts
-        btn.disabled = count < joueursFixes.length;
+        btn.disabled = count < 1
+            //joueursFixes.length;
 
         // Désactiver les options déjà prises
         const options = prenomSelect.querySelectorAll('option');
