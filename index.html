@@ -103,7 +103,7 @@
 </div>
 
 <div id="overlay" onclick="fermerImage()">
-    <img src="image.jpg" alt="Image plein écran">
+    <img src="route.jpg" alt="Image plein écran">
 </div>
 
 <script>
@@ -176,7 +176,8 @@
         }
 
         // Activer le bouton si tous les joueurs connus sont prêts
-        btn.disabled = count < joueursFixes.length;
+        btn.disabled = count < 2
+            //joueursFixes.length;
 
         // Désactiver les options déjà prises
         const options = prenomSelect.querySelectorAll('option');
