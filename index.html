@@ -176,8 +176,7 @@
         }
 
         // Activer le bouton si tous les joueurs connus sont prêts
-        btn.disabled = count < 2
-            //joueursFixes.length;
+        btn.disabled = count < joueursFixes.length;
 
         // Désactiver les options déjà prises
         const options = prenomSelect.querySelectorAll('option');
